@@ -1,0 +1,10 @@
+mediapipe
+opencv-python
+numpy
+ultralytics
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch
+torchvision
+torchaudio
+python-dotenv
+xgboost
