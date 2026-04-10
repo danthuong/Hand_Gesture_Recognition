@@ -45,6 +45,7 @@ Hệ thống nhận diện cử chỉ tay thời gian thực sử dụng kết h
   - `1-one`: Ngón trỏ giơ lên
   - `2-two`: Hai ngón giơ lên
   - `3-three`: Ba ngón giơ lên
+  - `5-rotate`: 5 ngón tay 
   - `7-victory`: Ngón Victory (V)
   - `4-open_close`: Open/Close
 
@@ -64,6 +65,8 @@ Hand_Gesture_Recognition/
 ├── Images/                    # Chứa hình ảnh và Dashboard Power BI
 │   ├── README.md              # Giải thích các Dashboard (System Health, Gestures...)
 │   └── *.png                  # Ảnh export từ Power BI
+├── collect_dynamic_data/      # Script và thu thập dữ liệu hành động động
+├── data/                      # Thư mục chứa dữ liệu ảnh/hành động dùng để huấn luyện
 ├── human_detection/
 │   └── human_detector.py      # YOLO person detection
 └── motion_detection/
