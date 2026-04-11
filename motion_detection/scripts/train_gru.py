@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from handlers.gru import MotionGRU
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
+PATH = os.path.join(os.path.dirname(base_dir), "models")
 SAVE_PATH = os.path.join(os.path.dirname(base_dir), "models", "motion_model.pth")
 
 # ==========================================
@@ -55,6 +56,31 @@ full_dataset = HandDataset("X_data.npy", "y_labels.npy", augment=True)
 train_size = int(0.8 * len(full_dataset)) # 20% Validation
 test_size = len(full_dataset) - train_size
 train_ds, test_ds = random_split(full_dataset, [train_size, test_size])
+
+# =====================================================================
+# BỔ SUNG: LƯU RIÊNG TẬP TEST ĐỘNG (20%) RA FILE CHO NOTEBOOK 4 ĐÁNH GIÁ
+# =====================================================================
+import os
+import numpy as np
+
+# 1. Lấy ra danh sách các vị trí (index) của tập Test vừa được chia
+test_indices = test_ds.indices
+
+# 2. Trích xuất mảng X và y từ dataset gốc dựa trên các index đó
+# (dataset.x và dataset.y là các biến được định nghĩa trong class HandDataset)
+X_test_dynamic = full_dataset.x[test_indices]
+y_test_dynamic = full_dataset.y[test_indices]
+
+# 3. Định nghĩa đường dẫn lưu file (lưu chung vào thư mục models)
+MODELS_DIR = os.path.dirname(PATH) # SAVE_PATH có sẵn trong file của bạn
+x_save_path = os.path.join(MODELS_DIR, 'X_test_dynamic.npy')
+y_save_path = os.path.join(MODELS_DIR, 'y_test_dynamic.npy')
+
+# 4. Lưu ra file .npy
+np.save(x_save_path, X_test_dynamic)
+np.save(y_save_path, y_test_dynamic)
+
+print(f"Đã xuất file tập Test Động: {x_save_path} (Shape: {X_test_dynamic.shape})")
 
 train_loader = DataLoader(train_ds, batch_size=16, shuffle=True)
 test_loader = DataLoader(test_ds, batch_size=16, shuffle=False)

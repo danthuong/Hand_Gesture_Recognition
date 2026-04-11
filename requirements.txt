@@ -1,7 +1,11 @@
 mediapipe
+xgboost
 opencv-python
 numpy
+pandas
 ultralytics
+scikit-learn
+seaborn
 --extra-index-url https://download.pytorch.org/whl/cu121
 torch
 torchvision
