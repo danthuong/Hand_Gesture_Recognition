@@ -153,6 +153,23 @@ def calculate_delta(sequence, missing_val=-1.0):
         
     return delta
 
+def visualizer_pipeline(raw_sequence):
+    """ 
+    Pipeline xử lí cho Visualizer:
+    1. Trám lỗ hổng (Fill)
+    2. Ép frame (Resize)
+    3. Chuẩn hóa không gian (Normalize)
+    -> Bỏ bước tính Delta.
+    """
+    filled = fill_missing_frames(raw_sequence)
+    
+    resized = resize_sequence_smoothly(filled, TARGET_FRAMES)
+    
+    normed = normalize_sequence(resized)
+    
+    return normed
+    
+
 def full_pipeline(raw_sequence):
     """ 
     1. Trám lỗ hổng trên video gốc.
@@ -166,7 +183,7 @@ def full_pipeline(raw_sequence):
     # 2. Nội suy thời gian 
     resized = resize_sequence_smoothly(filled, TARGET_FRAMES)
     
-    # 3. Chuẩn hóa (Dùng hàm normalize_sequence từ tin nhắn trước của tôi)
+    # 3. Chuẩn hóa 
     normed = normalize_sequence(resized)
     
     # 4. Tính Vận tốc
