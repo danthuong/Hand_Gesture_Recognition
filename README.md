@@ -1,100 +1,100 @@
 # Hand Gesture Recognition
 
-Hệ thống nhận diện cử chỉ tay thời gian thực sử dụng kết hợp computer vision và deep learning để phân loại các cử chỉ tay (cả tĩnh và động).
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![OpenCV](https://img.shields.io/badge/OpenCV-4.8+-red.svg)](https://opencv.org/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-Hand%20Tracking-orange.svg)](https://google.github.io/mediapipe/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-Static%20Gestures-green.svg)](https://xgboost.readthedocs.io/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-GRU%20Dynamic-red.svg)](https://pytorch.org/)
+[![YOLO](https://img.shields.io/badge/YOLOv8-Person%20Detection-yellow.svg)](https://ultralytics.com/)
 
-## Tổng Quan Kiến Trúc
+> Real-time hand gesture recognition system combining computer vision and deep learning to classify hand gestures (both static and dynamic).
 
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Camera    │───▶│    YOLO     │───▶│  Multi-Person
-│   Input     │    │  (Human)    │    │   Tracking
-└─────────────┘    └─────────────┘    └──────┬──────┘
-                                             │
-                    ┌────────────────────────┴────────────────────────┐
-                    ▼                                                 ▼
-          ┌─────────────────┐                              ┌─────────────────┐
-          │  MediaPipe      │                              │   Prediction    │
-          │  Hand Landmarks │                              │    Results      │
-          └────────┬────────┘                              └─────────────────┘
-                   │
-        ┌──────────┴──────────┐
-        ▼                     ▼
-┌─────────────────┐    ┌─────────────────┐
-│  XGBoost        │    │     GRU         │
-│  (Static)       │    │   (Dynamic)     │
-│  Gestures       │    │   Motion        │
-└─────────────────┘    └─────────────────┘
-```
+## 📊 Project Overview
 
-## Các Thành Phần Chính
+| Metric | Value |
+|--------|-------|
+| Static Gestures | 6 classes |
+| Dynamic Motions | 2 classes |
+| Hand Landmarks | 21 keypoints |
+| Max Hands Tracked | 4 simultaneous |
+| Detection Model | YOLOv8x |
+| Static Classifier | XGBoost |
+| Dynamic Classifier | GRU |
 
-### 1. Human Detection (`human_detection/`)
-- **Model**: YOLOv8x (Ultralytics)
-- **Chức năng**: Phát hiện và theo dõi nhiều người trong khung hình
-- **Output**: Bounding box + Track ID cho từng người
+**Source:** Custom dataset collected using MediaPipe Hand Landmarker
 
-### 2. Hand Extraction (`motion_detection/handlers/kp_extractor.py`)
-- **Model**: MediaPipe Hand Landmarker
-- **Chức năng**: Trích xuất 21 landmarks của bàn tay (tọa độ x, y, z)
-- **Hỗ trợ**: Tối đa 4 tay trong khung hình
+---
 
-### 3. Static Gesture Recognition (XGBoost)
-- **Model**: `gesture_model.pkl`
-- **Input**: 42 features (21 điểm × 2 trục x, y)
-- **Cử chỉ hỗ trợ**:
-  - `1-one`: Ngón trỏ giơ lên
-  - `2-two`: Hai ngón giơ lên
-  - `3-three`: Ba ngón giơ lên
-  - `5-rotate`: 5 ngón tay 
-  - `7-victory`: Ngón Victory (V)
-  - `4-open_close`: Open/Close
+## 📚 Project Components
 
-### 4. Dynamic Motion Recognition (GRU)
-- **Model**: `motion_model.pth` (PyTorch)
-- **Input**: 50 frames × 252 features (tọa độ + velocity)
-- **Hành động hỗ trợ**:
-  - `Clap`: Vỗ tay
-  - `Shake`: Lắc tay
+| Phần | Nội dung | Người thực hiện | Status |
+|------|----------|----------------|--------|
+| 🧠 **1. Introduction** | Project overview & motivation | Team | ✅ Done |
+| 📖 **2. Related Work** | Literature review | Team | ✅ Done |
+| 🧹 **3. Data Preprocessing** | EDA & feature engineering | Team | ✅ Done |
+| 🤖 **4. ML Models** | XGBoost & GRU architecture | Team | ✅ Done |
+| 🧪 **5. Experiment** | Experimental setup | Team | ✅ Done |
+| 📊 **6. Results** | Performance analysis | Team | ✅ Done |
+| 🎯 **7. Conclusion** | Summary & future work | Team | ✅ Done |
+| 📚 **8. References** | Academic references | Team | ✅ Done |
 
-## Cấu Trúc Thư Mục
+---
+
+## 🗂️ Project Structure
 
 ```
 Hand_Gesture_Recognition/
-├── requirements.txt
-├── .gitignore
-├── Images/                    # Chứa hình ảnh và Dashboard Power BI
-│   ├── README.md              # Giải thích các Dashboard (System Health, Gestures...)
-│   └── *.png                  # Ảnh export từ Power BI
-├── collect_dynamic_data/      # Script và thu thập dữ liệu hành động động
-├── data/                      # Thư mục chứa dữ liệu ảnh/hành động dùng để huấn luyện
+├── README.md                    # This file
+├── requirements.txt             # Python dependencies
+├── Images/                      # Dashboard images & plots
+│   ├── 01_gesture_distribution.png
+│   ├── 02_feature_boxplot_p8y.png
+│   ├── 03_correlation_heatmap.png
+│   ├── 04_tsne_projection.png
+│   ├── 05_mean_profile.png
+│   └── *.png
+├── reports/                     # LaTeX report files
+│   ├── main.tex
+│   └── Sections/
+│       ├── 0-Title.tex
+│       ├── 1-Intro.tex
+│       ├── 2-RelatedWork.tex
+│       ├── 3-DataPreprocessing.tex
+│       ├── 4-MLModels.tex
+│       ├── 5-Experiment.tex
+│       ├── 6-Results.tex
+│       ├── 7-Conclusion.tex
+│       └── 8-References.tex
+├── ML (1)/                      # LaTeX template reference
+├── collect_dynamic_data/        # Dynamic data collection scripts
+├── data/                        # Training data
 ├── human_detection/
-│   └── human_detector.py      # YOLO person detection
+│   └── human_detector.py        # YOLO person detection
 └── motion_detection/
-    ├── main.py                # Main application (có tích hợp Telemetry tracking)
+    ├── main.py                  # Main application
     ├── handlers/
-    │   ├── kp_extractor.py    # MediaPipe wrapper
-    │   ├── gru.py             # GRU model definition
-    │   ├── audio_handler.py   # Audio processing
-    │   └── detect_human.py    # Human detection wrapper
+    │   ├── kp_extractor.py      # MediaPipe wrapper
+    │   ├── gru.py               # GRU model
+    │   ├── audio_handler.py     # Audio processing
+    │   └── detect_human.py      # Human detection wrapper
     ├── utils/
-    │   ├── motion_utils.py    # Motion preprocessing
-    │   ├── hand_helpers.py    # Hand landmark processing
-    │   ├── visualizer.py      # Drawing utilities
-    │   ├── logger.py          # Logging utilities
-    │   └── preprocess.py      # Data preprocessing
+    │   ├── motion_utils.py
+    │   ├── hand_helpers.py
+    │   ├── visualizer.py
+    │   ├── logger.py
+    │   └── preprocess.py
     ├── scripts/
-    │   ├── train_model.py         # Huấn luyện XGBoost & xuất Power BI metrics
-    │   ├── train_gru.py           # Huấn luyện GRU & xuất Power BI metrics
-    │   ├── export_radar_chart.py  # Trích xuất đặc trưng hình học bàn tay (Radar Chart)
-    │   ├── prepare_data.py        # Tiền xử lý dữ liệu
-    │   └── create_csv.py          # Tạo file CSV ban đầu
+    │   ├── train_model.py       # XGBoost training
+    │   ├── train_gru.py         # GRU training
+    │   ├── prepare_data.py
+    │   └── create_csv.py
     ├── models/
-    │   ├── yolov8n.pt / .pt       # YOLO models
-    │   ├── gesture_recognizer.task  # MediaPipe
-    │   ├── hand_landmarker.task     # MediaPipe
-    │   ├── gesture_model.pkl       # XGBoost model
-    │   ├── motion_model.pth        # GRU model
-    │   └── hand_gestures.csv       # Training data
+    │   ├── yolov8n.pt
+    │   ├── gesture_recognizer.task
+    │   ├── hand_landmarker.task
+    │   ├── gesture_model.pkl
+    │   ├── motion_model.pth
+    │   └── hand_gestures.csv
     └── test/
         ├── test_camera.py
         ├── test_hand.py
@@ -102,51 +102,122 @@ Hand_Gesture_Recognition/
         └── test_mic.py
 ```
 
-## Cài Đặt
+---
+
+## 🚀 Quick Start
+
+### 1. Setup
 
 ```bash
-# Cài đặt dependencies
+# Clone the repository
+git clone https://github.com/your-repo/Hand_Gesture_Recognition.git
+cd Hand_Gesture_Recognition
+
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# Windows
+.venv\Scripts\activate
+# macOS/Linux
+source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Cài đặt PyTorch với CUDA (nếu có GPU NVIDIA)
+# Install PyTorch with CUDA (for NVIDIA GPU)
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
-## Sử Dụng
+### 2. Run the System
 
 ```bash
-# Chạy hệ thống nhận diện cử chỉ
+# Start hand gesture recognition
 python motion_detection/main.py
 
-# Huấn luyện lại mô hình XGBoost (static gestures)
+# Train XGBoost model (static gestures)
 python motion_detection/scripts/train_model.py
 
-# Huấn luyện lại mô hình GRU (dynamic motions)
+# Train GRU model (dynamic motions)
 python motion_detection/scripts/train_gru.py
 ```
 
-Điều khiển:
-- `q`: Thoát
+**Controls:**
+- `q`: Quit application
 
-## Các Tính Năng Chính
+---
 
-1. **Multi-Person Tracking**: Theo dõi và xử lý đồng thời nhiều người
-2. **Real-time Processing**: Xử lý thời gian thực với FPS cao
-3. **Noise Filtering**: 
-   - Buffer voting (30 frames) cho GRU
-   - Hold-to-confirm (1 giây) cho static gestures
+## 🛠️ Tech Stack
+
+| Category | Tools |
+|----------|-------|
+| Language | Python 3.8+ |
+| Computer Vision | OpenCV, MediaPipe |
+| Object Detection | YOLOv8 (Ultralytics) |
+| Static Classification | XGBoost |
+| Dynamic Classification | PyTorch GRU |
+| Report | LaTeX (Overleaf) |
+| Visualization | Plotly, Seaborn |
+
+---
+
+## 🎯 Supported Gestures
+
+### Static Gestures (XGBoost)
+| Gesture | Description |
+|---------|-------------|
+| `1-one` | Index finger up |
+| `2-two` | Two fingers up |
+| `3-three` | Three fingers up |
+| `5-rotate` | Five fingers open |
+| `7-victory` | Victory sign (V) |
+| `4-open_close` | Open/Close hand |
+
+### Dynamic Motions (GRU)
+| Motion | Description |
+|--------|-------------|
+| `Clap` | Clapping motion |
+| `Shake` | Hand shaking |
+
+---
+
+## 🔑 Key Features
+
+1. **Multi-Person Tracking**: Simultaneous tracking of multiple people
+2. **Real-time Processing**: High FPS real-time processing
+3. **Noise Filtering**:
+   - Buffer voting (30 frames) for GRU
+   - Hold-to-confirm (1 second) for static gestures
    - Confidence threshold (85%)
-4. **Smart Cooldown**: Tránh triggers trùng lặp với cooldown 1.5 giây
+4. **Smart Cooldown**: 1.5s cooldown to prevent duplicate triggers
 
-## Yêu Cầu Hệ Thống
+---
 
-- Python 3.8+
-- OpenCV
-- MediaPipe
-- PyTorch (CUDA cho GPU)
-- XGBoost
-- Ultralytics (YOLO)
-
-## License
+## 📜 License
 
 MIT License
+
+---
+
+## 👥 Contributors
+
+| STT | Họ & tên | MSSV | Nhiệm vụ đảm nhiệm | % Hoàn thành |
+|-----|----------|------|---------------------|--------------|
+| 1 | Đào Quang Dương | 2310579 | - Lập trình và huấn luyện mô hình nhận diện (XGBoost, mạng GRU).<br>- Tích hợp luồng camera xử lý thời gian thực (Real-time).<br>- Tinh chỉnh siêu tham số (Hyperparameter Tuning). | 100% |
+| 2 | Võ Thanh Đạt | 2310717 | - Xử lý số liệu, xuất các ma trận nhầm lẫn và metrics đánh giá.<br>- Thiết kế và xây dựng Dashboard trực quan hóa trên Power BI.<br>- Hỗ trợ phân tích lỗi (Error Analysis) từ các biểu đồ thực nghiệm. | 100% |
+| 3 | Hà Bảo Nhi | 2312496 | - Khai phá dữ liệu (EDA) và Tiền xử lý (Preprocessing) chuyên sâu.<br>- Tham gia lập trình thuật toán và trích xuất đặc trưng tay.<br>- Soạn thảo báo cáo, tổng hợp và phân tích kết quả thực nghiệm. | 100% |
+
+**Course:** Data Mining
+
+---
+
+## 🔗 References
+
+1. [MediaPipe Hand Landmarker](https://google.github.io/mediapipe/solutions/hands)
+2. [YOLOv8 Documentation](https://docs.ultralytics.com/)
+3. [XGBoost: A Scalable Tree Boosting System](https://arxiv.org/abs/1603.02754)
+4. [GRU: Learning Phrase Representations using RNN Encoder-Decoder](https://arxiv.org/abs/1412.3555)
+
+---
+
+*Last Updated: April 2026*
