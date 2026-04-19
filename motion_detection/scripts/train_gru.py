@@ -5,9 +5,24 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 import numpy as np
+import random
+
+# ==========================================
+# SETTING SEED CHO REPRODUCIBILITY
+# ==========================================
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+set_seed(42)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from handlers.gru import MotionGRU
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -102,6 +117,7 @@ best_val_loss = float('inf')
 print("\nTRAINING...")
 for epoch in range(EPOCHS):
     # --- TRAIN ---
+    full_dataset.augment = True  # <--- BẬT NHIỄU KHI TRAIN
     model.train()
     train_loss = 0
     for inputs, labels in train_loader:
@@ -118,6 +134,7 @@ for epoch in range(EPOCHS):
     avg_train_loss = train_loss / len(train_loader)
 
     # --- VALIDATION ---
+    full_dataset.augment = False # <--- TẮT NHIỄU KHI CHẤM ĐIỂM VAL
     model.eval()
     val_loss = 0
     correct = 0
@@ -148,7 +165,7 @@ for epoch in range(EPOCHS):
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
         torch.save(model.state_dict(), SAVE_PATH)
-        if (epoch + 1) > 10: # Không in rác ở mấy epoch đầu
+        if (epoch + 1) > 10: 
             print(f"  -> Saved best model (Val Loss {best_val_loss:.4f})")
 
 print(f"\nDONE TRAINING, BEST MODEL AT {SAVE_PATH}.")
@@ -163,13 +180,14 @@ from sklearn.metrics import classification_report, confusion_matrix
 MODELS_DIR = os.path.dirname(SAVE_PATH)
 LABEL_MAP_INV = {0: 'none', 1: 'shake', 2: 'clap'}
 
-# A. Data Balance (Tính trên toàn tập gốc để biễu diễn thực tế số lượng mẫu)
+# A. Data Balance
 y_all = np.load("y_labels.npy")
 unique_labels, counts = np.unique(y_all, return_counts=True)
 balance_data = [{'Label': LABEL_MAP_INV[l], 'Count': c} for l, c in zip(unique_labels, counts)]
 pd.DataFrame(balance_data).to_csv(os.path.join(MODELS_DIR, 'powerbi_gru_data_balance.csv'), index=False)
 
-# Chạy inference trên tập TEST vừa chia
+# B. Inference
+full_dataset.augment = False # <--- CHẮC CHẮN TẮT NHIỄU KHI XUẤT REPORT
 model.load_state_dict(torch.load(SAVE_PATH, weights_only=True))
 model.eval()
 
@@ -177,8 +195,6 @@ y_test_true = []
 y_test_pred = []
 
 with torch.no_grad():
-    # Sử dụng nguyên xi cái test_loader (đại diện cho tập Test) lúc nãy
-    # Đã có shuffle=False rồi nên duyệt theo thứ tự
     for inputs, labels in test_loader:
         inputs = inputs.to(device)
         outputs = model(inputs)
@@ -190,7 +206,7 @@ with torch.no_grad():
 y_true_text = [LABEL_MAP_INV[l] for l in y_test_true]
 y_pred_text = [LABEL_MAP_INV[l] for l in y_test_pred]
 
-# B. Metrics
+# C. Metrics & Confusion Matrix
 report = classification_report(y_true_text, y_pred_text, output_dict=True, zero_division=0)
 metrics_data = []
 for label, metrics in report.items():
@@ -212,7 +228,6 @@ metrics_data.append({
 })
 pd.DataFrame(metrics_data).to_csv(os.path.join(MODELS_DIR, 'powerbi_gru_model_metrics.csv'), index=False)
 
-# C. Confusion Matrix
 labels_list = list(LABEL_MAP_INV.values())
 cm = confusion_matrix(y_true_text, y_pred_text, labels=labels_list)
 cm_df = pd.DataFrame(cm, index=labels_list, columns=labels_list)
@@ -222,4 +237,4 @@ cm_df.reset_index(inplace=True)
 cm_df_melted = cm_df.melt(id_vars='True_Label', var_name='Predicted_Label', value_name='Count')
 cm_df_melted.to_csv(os.path.join(MODELS_DIR, 'powerbi_gru_confusion_matrix.csv'), index=False)
 
-print("-> Hoàn tất xuất GRU Metrics & Confusion Matrix vào thư mục models/")
+print("-> Hoàn tất xuất GRU Metrics & Confusion Matrix vào thư mục models!")
